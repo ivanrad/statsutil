@@ -4,20 +4,21 @@
 Read a sequence of newline delimited decimal numbers from file(s) (or standard
 input), and print k-th percentile (95th by default) to standard output.
 """
+from collections import defaultdict
 from decimal import Decimal
 from typing import Iterable, Optional
 
 def percentile(iterable: Iterable[Decimal], p: int = 95) -> Optional[Decimal]:
     """Return k-th percentile for a sequence of Decimal values"""
-    vals = []
+    vals = defaultdict(int)
     n = 0
     for line in iterable:
-        vals.append(Decimal(line))
+        vals[Decimal(line)] += 1
         n += 1
-    cutoff = Decimal(n) * ((Decimal(p) / 100))
+    cutoff = int(n * ((Decimal(p) / 100)))
     c = 0
-    for v in sorted(vals):
-        c += 1
+    for v in sorted(vals.keys()):
+        c += vals[v]
         if c > cutoff:
             return v
     return None
