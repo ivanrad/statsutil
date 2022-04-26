@@ -4,10 +4,14 @@
 Read a sequence of newline delimited decimal numbers from file(s) (or standard
 input), and print standard deviation to standard out.
 """
+import argparse
+import fileinput
+import sys
 from decimal import Decimal
-from typing import Iterable
+from typing import Iterable, Union
 
-def stddev(iterable: Iterable[Decimal]) -> Decimal:
+
+def stddev(iterable: Iterable[Union[Decimal, str]]) -> Decimal:
     """Population standard deviation for a sequence of Decimal values"""
     m, m2 = Decimal(0), Decimal(0)
     n = 0
@@ -16,11 +20,20 @@ def stddev(iterable: Iterable[Decimal]) -> Decimal:
         m += v
         m2 += v**2
         n += 1
-    return (m2/n - (m/n)**2).sqrt() if n > 0 else Decimal(0)
+    return (m2 / n - (m / n) ** 2).sqrt() if n > 0 else Decimal(0)
 
-if __name__ == '__main__':
-    import fileinput, sys
+
+def main() -> None:
+    """Entry point"""
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.RawDescriptionHelpFormatter, description=__doc__
+    )
+    parser.parse_args()
 
     with fileinput.input(files=sys.argv[1:]) as fi:
-        std = stddev(fi)
+        std = stddev(fi)  # type: ignore
         print(f'{std:.3f}')
+
+
+if __name__ == '__main__':
+    main()

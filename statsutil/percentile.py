@@ -4,13 +4,16 @@
 Read a sequence of newline delimited decimal numbers from file(s) (or standard
 input), and print k-th percentile (95th by default) to standard output.
 """
+import argparse
+import fileinput
 from collections import defaultdict
 from decimal import Decimal
-from typing import Iterable, Optional
+from typing import DefaultDict, Iterable, Optional, Union
 
-def percentile(iterable: Iterable[Decimal], p: int = 95) -> Optional[Decimal]:
+
+def percentile(iterable: Iterable[Union[Decimal, str]], p: int = 95) -> Optional[Decimal]:
     """Return k-th percentile for a sequence of Decimal values"""
-    vals = defaultdict(int)
+    vals: DefaultDict[Decimal, int] = defaultdict(int)
     n = 0
     for line in iterable:
         vals[Decimal(line)] += 1
@@ -23,16 +26,19 @@ def percentile(iterable: Iterable[Decimal], p: int = 95) -> Optional[Decimal]:
             return v
     return None
 
-if __name__ == '__main__':
-    import argparse, sys, fileinput
+
+def main() -> None:
+    """Entry point"""
 
     def valid_percentile(p):
         p = int(p)
-        if not (p >= 1 and p <= 99):
+        if p < 1 or p > 99:
             raise argparse.ArgumentTypeError('percentile should be between 1 and 99')
         return p
 
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.RawDescriptionHelpFormatter, description=__doc__
+    )
     parser.add_argument(
         '-p',
         type=valid_percentile,
@@ -43,5 +49,9 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     with fileinput.input(files=args.file) as fi:
-        p = percentile(fi, p=args.p)
+        p = percentile(fi, p=args.p)  # type: ignore
         print(p)
+
+
+if __name__ == '__main__':
+    main()
