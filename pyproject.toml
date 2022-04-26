@@ -1,0 +1,19 @@
+[build-system]
+requires = ['setuptools']
+build-backend = 'setuptools.build_meta'
+
+[tool.black]
+line-length = 100 
+skip-string-normalization = true
+target-version = ['py38', 'py39']
+
+[tool.isort]
+profile = 'black'
+
+[tool.pylint.BASIC]
+argument-naming-style = 'any'
+variable-naming-style= 'any'
+
+[tool.pylint.FORMAT]
+max-line-length = 100
+
